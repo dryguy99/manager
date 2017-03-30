@@ -49,146 +49,121 @@ inquirer.prompt([
   		createPlayers(i);
 	}
 	else{
+		var x = 0;
 		for (x = 0; x < 8; x++) {
 			playerArray[x].printInfo();
 		}
 	}
 } // end createPlayers function
+//-----------------------------------------------------------
 createPlayers(0);
 
 var teamScore = 0;
 var teamOffense = 0;
 var teamDefense = 0;
+//-----------------------------------------------------------
 var teamStats = function () {
 	for (var y = 0; y < 4; y++) {
 	 teamOffense += parseInt(playerArray[y].offenseValue);
 	 teamDefense += parseInt(playerArray[y].defenseValue);
 	}
 }
+//-----------------------------------------------------------
 var offense = function () {
-	Math.random() *((50-1)+1);}
-
+	Math.floor((Math.random()*(50-1))+1);}
+//-----------------------------------------------------------
 var defense = function () { 
-	Math.random() *((50-1)+1);}
-
-var coinflip = function {
-	Mathround(Math.random()*2;}
-
+	Math.floor((Math.random()*(50-1))+1);}
+//-----------------------------------------------------------
+var coinflip = function () {
+	Math.floor(Math.random()*2);}
+//-----------------------------------------------------------
 var gameCount = 0;
 
+function  substitution() {
+		inquirer.prompt([
+	  	{
+	    name: "confirm",
+	    message: "Would you like to make a substitution",
+	    confirm: (boolean),
+	    validate: function() {
+	    	if (confirm === true) {
+	    		inquirer.prompt([
+	    			{
+	    				type: "list",
+	    				name: "choices",
+	    				message: "Who do you want to remove?",
+	    				choices: [playerArray[0], playerArray[1], playerArray[2], playerArray[3],playerArray[4]],
+	    				validate: function (){
+	    					if (choices !== playerArray[0]) {
+	    						console.log(playerArray);
+	    						var sub = playerArray.indexOf(choices);
+	    						var tempPlayer = choices;
+	    						playerArray.splice(sub, 1);
+	    						playerArray.splice(0,0, tempPlayer);
+	    						var x = 0;
+								for (x = 0; x < 5; x++) {
+									playerArray[x].printInfo();
+								}
+	    						return true;
+	    					} 
+	    				}
+	    			},
+	    			{
+	    				type: "list",
+	    				name: "choices",
+	    				message: "Who do you want to add?",
+	    				choices: [playerArray[5], playerArray[6], playerArray[7]],
+	    				validate: function (){
+	    						console.log(playerArray);
+	    						var sub = playerArray.indexOf(choices);
+	    						var tempPlayer = choices;
+	    						var moveSub = playerArray[0];
+	    						playerArray.splice(sub, 1);
+	    						playerArray.splice(0,0, tempPlayer);
+	    						playerArray.splice(1,1);
+	    						playerArray.splice(5,0, moveSub);
+	    						var x = 5;
+								for (x = 5; x < 8; x++) {
+									playerArray[x].printInfo();
+								}
+	    						return true;
+	    					
+	    				}
+	    			}
+	    		]); // end inquirer prompt
+	    	} // end substitution of players
+	    	return true;
+	   	} //end validate
+	}// end inquirer prompt
+	]);   
+} //end substitution function
+//-----------------------------------------------------------
+// play the game x = number of times
 var playGame = function(x) {
 	offense();
 	defense();
 	coinflip();
 	if (teamOffense > offense) {
 		teamScore++;
-	}.then(function () {
-		inquirer.prompt([
-	  {
-	    type: "list",
-	    message: "Would you like to make a substitution",
-	    confirm: (boolean),
-	    validate: function() {
-	    	if (confirm === true) {
-	    		inquirer.prompt([
-	    			{
-	    				type: "list",
-	    				message: "Who do you want to remove?",
-	    				choices: [playerArray[0], playerArray[1], playerArray[2], playerArray[3],playerArray[4] ];
-	    				validate: function (){
-	    					if (choices !== playerArray[0]) {
-	    						console.log(playerArray);
-	    						var sub = playerArray.indexOf(choices);
-	    						var tempPlayer = choices;
-	    						playerArray.splice(sub, 1);
-	    						playerArray.splice(0,0, tempPlayer);
-	    						console.log(playerArray);
-	    						return true;
-	    					} 
-	    				},
-	    			{
-	    				type: "list",
-	    				message: "Who do you want to add?",
-	    				choices: [playerArray[5], playerArray[6], playerArray[7]];
-	    				validate: function (){
-	    						console.log(playerArray);
-	    						var sub = playerArray.indexOf(choices);
-	    						var tempPlayer = choices;
-	    						var moveSub = playerArray[0];
-	    						playerArray.splice(sub, 1);
-	    						playerArray.splice(0,0, tempPlayer);
-	    						playerArray.splice(1,1);
-	    						playerArray.splice(5,0, moveSub);
-	    						console.log(playerArray);
-	    						return true;
-	    					
-	    				}
-	    			}
-	    			}
-	    		]);
-	    		return true;
-	    	}
-	    return true;
-	   	}
-		}
-	    
-	  }
-	
-		if (teamDefense < defense) {
+		substitution();
+	}
+	if (teamDefense < defense) {
 		teamScore--;
-		.then(function () {
-		inquirer.prompt([
-	  {
-	    type: "list",
-	    message: "Would you like to make a substitution",
-	    confirm: (boolean),
-	    validate: function() {
-	    	if (confirm === true) {
-	    		inquirer.prompt([
-	    			{
-	    				name: "chpices",
-	    				type: "list",
-	    				message: "Who do you want to remove?",
-	    				choices: [playerArray[0], playerArray[1], playerArray[2], playerArray[3],playerArray[4] ];
-	    				validate: function (){
-	    					if (choices !== playerArray[0]) {
-	    						console.log(playerArray);
-	    						var sub = playerArray.indexOf(choices);
-	    						var tempPlayer = choices;
-	    						playerArray.splice(sub, 1);
-	    						playerArray.splice(0,0, tempPlayer);
-	    						console.log(playerArray);
-	    						return true;
-	    					} 
-	    				},
-	    			{
-	    				name: "choices"
-	    				type: "list",
-	    				message: "Who do you want to add?",
-	    				choices: [playerArray[5], playerArray[6], playerArray[7]];
-	    				validate: function (){
-	    						console.log(playerArray);
-	    						var sub = playerArray.indexOf(choices);
-	    						var tempPlayer = choices;
-	    						var moveSub = playerArray[0];
-	    						playerArray.splice(sub, 1);
-	    						playerArray.splice(0,0, tempPlayer);
-	    						playerArray.splice(1,1);
-	    						playerArray.splice(5,0, moveSub);
-	    						console.log(playerArray);
-	    						return true;
-	    				}
-	    			}
-	    			}
-	    		]);
-	    		return true;
-	    	}
-	    return true;
-	   	}
-		}
-	    
-	  }
+		substitution();
+	}
+	x++;
+	if (x < 10) {
+		playGame(x);
+	}
+	else {
+
+	}
 }
+//-----------------------------------------------------------
+// create the players
+createPlayers(0);
+// begin play game
+playGame(0);
 
 
-}
