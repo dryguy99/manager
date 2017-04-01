@@ -75,7 +75,7 @@ var createPlayers = function() {
 }; // end createPlayers function
 //-----------------------------------------------------------
 
-var teamScore = 0;
+var score = 0;
 var teamOffense = 0;
 var teamDefense = 0;
 //-----------------------------------------------------------
@@ -86,97 +86,145 @@ var teamStats = function () {
  	}
 }
 //-----------------------------------------------------------
-var offense = function () {
+var Offense = function () {
  	Math.floor((Math.random()*(50-1))+1);}
 //-----------------------------------------------------------
-var defense = function () { 
+var Defense = function () { 
  	Math.floor((Math.random()*(50-1))+1);}
  //-----------------------------------------------------------
- var coinflip = function () {
+ var Coinflip = function () {
  	Math.floor(Math.random()*2);}
 //-----------------------------------------------------------
  var gameCount = 0;
 
- function  substitution() {
- 		inquirer.prompt([
-	  	{
- 	    name: "confirm",
- 	    message: "Would you like to make a substitution",
- 	    confirm: (boolean),
- 	    validate: function() {
- 	    	if (confirm === true) {
- 	    		inquirer.prompt([
- 	    			{
- 	    				type: "list",
- 	    				name: "choices",
- 	    				message: "Who do you want to remove?",
- 	    				choices: [playerArray[0], playerArray[1], playerArray[2], playerArray[3],playerArray[4]],
- 	    				validate: function (){
- 	    					if (choices !== playerArray[0]) {
- 	    						console.log(playerArray);
- 	    						var sub = playerArray.indexOf(choices);
- 	    						var tempPlayer = choices;
- 	    						playerArray.splice(sub, 1);
- 	    						playerArray.splice(0,0, tempPlayer);
- 	    						var x = 0;
- 								for (x = 0; x < 5; x++) {
- 									playerArray[x].printInfo();
- 								}
- 	    						return true;
- 	    					} 
- 	    				}
- 	    			},
- 	    			{
- 	    				type: "list",
- 	    				name: "choices",
- 	    				message: "Who do you want to add?",
- 	    				choices: [playerArray[5], playerArray[6], playerArray[7]],
- 	    				validate: function (){
- 	    						console.log(playerArray);
- 	    						var sub = playerArray.indexOf(choices);
- 	    						var tempPlayer = choices;
- 	    						var moveSub = playerArray[0];
- 	    						playerArray.splice(sub, 1);
- 	    						playerArray.splice(0,0, tempPlayer);
- 	    						playerArray.splice(1,1);
-	    						playerArray.splice(5,0, moveSub);
- 	    						var x = 5;
-								for (x = 5; x < 8; x++) {
-									playerArray[x].printInfo();
- 								}
-	    						return true;
-	    					
-	    				}
-	    			}
- 	    		]); // end inquirer prompt
- 	    	} // end substitution of players
- 	    	return true;
- 	   	} //end validate
- 	}// end inquirer prompt
- 	]);   
-} //end substitution function
+ 
 //-----------------------------------------------------------
 // play the game x = number of times
- var playGame = function(x) {
- 	if (x < 10) {
- 		offense();
- 		defense();
- 		coinflip();
- 		if (teamOffense > offense) {
- 			teamScore++;
- 			substitution();
- 		}
- 		if (teamDefense < defense) {
- 			teamScore--;
- 			substitution();
- 		}
- 		x++;
- 		playGame(x);
- 	}
- 	else {
- 		console.log("end game");
-	}
+ function playGame(x) {
+  if (x < 9) {
+    // adds one to x and prints the current round of the game
+    x++;
+    console.log("----------\nROUND " + x + "\n----------");
+    // finds two random numbers between 1 and 50 to compare the starter objects' stats to
+    var offenseRandom = Offense();
+    var defenseRandom = Defense();
+    // loops through the starter array to find if the total value of their offense and defense
+    var teamOffense = 0;
+    var teamDefense = 0;
+    for (var i = 0; i < 5; i++) {
+      teamOffense += playerArray[i].offense;
+      teamDefense += playerArray[i].defense;
+    }
+    console.log("Team Offense: " + teamOffense);
+    console.log("Team Defense: " + teamDefense);
+    console.log("Random O: " + offenseRandom);
+    console.log("Random D: " + defenseRandom);
+    // determines if teamOffense is less than offenseRandom and adds one to score if true
+    if (offenseRandom < teamOffense) {
+      console.log("YOU SCORED A PONT!");
+      score++;
+    }
+    // determines if teamDefense is greater than defenseRandom and subtracts one from score if true
+    if (defenseRandom > teamDefense) {
+      console.log("YOU WERE SCORED UPON!");
+      score--;
+    }
+    // prompts to figure out if the player would like to make a substitution
+    inquirer.prompt([
+      {
+        name: "confirm",
+        type: "confirm",
+        message: "Would you like to make a substitution?"
+      }
+    ]).then(function(answer) {
+      // if the answer is yes, start the substitution prompts
+      if (answer.confirm === true) {
+        inquirer.prompt([
+          {
+            name: "sub",
+            type: "rawlist",
+            message: "Who would you like to sub in?",
+            // sets the names of all those contained within the subs array as choices
+            choices: [playerArray[5], playerArray[6], playerArray[7]]
+          }
+        ]).then(function(subIn) {
+          // finds the player object within the subs array with the name that matches
+          // the user's choice and places it within the sideline variable
+          var sideline = {};
+          var number = 0;
+          for (var i = 5; i < 8; i++) {
+            if (playerArray[i].name === subIn.sub) {
+              number = i;
+              sideline = playerArray[i];
+            }
+          }
+          inquirer.prompt([
+            {
+              name: "sub",
+              type: "rawlist",
+              message: "Who would you like to sub out?",
+              choices: [playerArray[0], playerArray[1], playerArray[2], playerArray[3], playerArray[4]]
+            }
+          ]).then(function(subOut) {
+            // finds the player object within the starters array with the name that matches the user's choice
+            // and swaps it with the value contained within sideline after moving them into the subs array
+            for (var i = 0; i < 5; i++) {
+              if (playerArray[i].name === subOut.sub) {
+                playerArray[number] = starters[i];
+                playerArray[i] = sideline;
+                console.log("SUBSTITUTION MADE!");
+              }
+            }
+            // starts the next round
+            playGame(x);
+          });
+        });
+      }
+      else {
+        // starts the next round
+        playGame(x);
+      }
+    });
+  }
+  else {
+    // prints the final score
+    console.log("FINAL SCORE: " + score);
+    // if the score was greater than 0, prints the winning message and increases starters stats
+    if (score > 0) {
+      console.log("Good game, everyone!\nYour current starters' stats have improved!");
+      for (var i = 0; i < starters.length; i++) {
+        starters[i].goodGame();
+      }
+    }
+    // if the score was less than 0, prints the losing message and decreases starters stats
+    if (score < 0) {
+      console.log("That was a poor performance!\nYour current starters' stats have decreased!");
+      for (var i = 0; i < starters.length; i++) {
+        starters[i].badGame();
+      }
+      // if the score was zero, prints the tie message and does nothing to the starters stats
+    }
+    if (score === 0) {
+      console.log("It was a tie game! Not good. Not bad.");
+    }
+    // prompts the user if they would like to play again. if yes, run playgame with a value of 0 being passed into it.
+    // if not, print the "come back again soon message" and exit
+    inquirer.prompt({
+      name: "again",
+      type: "confirm",
+      message: "Would you like to play another match?"
+    }).then(function(answer) {
+      if (answer.again === true) {
+        // starts new match with the same players
+        playGame(0);
+      }
+      else {
+        console.log("Come back again soon!");
+      }
+    });
+  }
 }
+
 //-----------------------------------------------------------
 // create the players
 createPlayers();
